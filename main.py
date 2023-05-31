@@ -32,25 +32,34 @@ def api_call():
     if weather[0]["id"] < 600:
         forecast = weather[0]["main"]
         send_message(forecast)
+        is_rainy = True
+    
 
-def send_message(forecast: str):
+def send_message(forecast: str, is_rainy: bool):
     client = Client(ACCOUNT_SID, AUTH_TOKEN)
-    quote, nickname = select_quote_and_name()
-    message = client.messages.create(
-        body=f"\n{quote}Please consider taking an umbrella. [Forecast in {CITY_NAME}: {forecast}]\nI like you a lot {nickname} :)",
-        from_=MY_TWILIO_NUMBER,
-        to=SHAWTY_BAES_NUMBER
-    )
-    time.sleep(10)
-    if message.status != "failed" and message.status != "canceled" and message.status != "undelivered":
-        confimation_message = client.messages.create(
-            body=f"Message sent to SC: {message.body}\n Date: {message.date_sent}",
+    if is_rainy:
+        quote, nickname = select_quote_and_name()
+        message = client.messages.create(
+            body=f"\n{quote}Please consider taking an umbrella. [Forecast in {CITY_NAME}: {forecast}]\nI like you a lot {nickname} :)",
+            from_=MY_TWILIO_NUMBER,
+            to=SHAWTY_BAES_NUMBER
+        )
+        time.sleep(10)
+        if message.status != "failed" and message.status != "canceled" and message.status != "undelivered":
+            confimation_message = client.messages.create(
+                body=f"Message sent to SC: {message.body}\n Date: {message.date_sent}",
+                from_=MY_TWILIO_NUMBER,
+                to=CONFIRMATION_NUMBER
+            )
+        else:
+            with open("errors.txt", 'a') as f:
+                f.write(f"{message.error_code} | {message.error_message} | {message.date_created}")
+    else:
+        message = client.messages.create(
+            body=f"Not raining today in {CITY_NAME} forecast is {forecast}",
             from_=MY_TWILIO_NUMBER,
             to=CONFIRMATION_NUMBER
         )
-    else:
-        with open("errors.txt", 'a') as f:
-            f.write(f"{message.error_code} | {message.error_message} | {message.date_created}")
 
 def main():
     api_call()
