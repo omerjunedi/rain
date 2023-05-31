@@ -43,6 +43,7 @@ def send_message(forecast: str):
     )
     time.sleep(10)
     if message.status != "failed" and message.status != "canceled" and message.status != "undelivered":
+    
         confimation_message = client.messages.create(
             body=f"Message sent to SC: {message.body}\n Date: {message.date_sent}",
             from_=MY_TWILIO_NUMBER,
