@@ -3,6 +3,7 @@ import requests
 import random
 from secret import API_KEY, CITY_ID, CITY_NAME, ACCOUNT_SID, AUTH_TOKEN, SHAWTY_BAES_NUMBER, MY_TWILIO_NUMBER, CONFIRMATION_NUMBER
 from twilio.rest import Client
+import time
 BASE_URL: str = "https://api.openweathermap.org/data/2.5/weather?id="
 
 
@@ -40,7 +41,8 @@ def send_message(forecast: str):
         from_=MY_TWILIO_NUMBER,
         to=SHAWTY_BAES_NUMBER
     )
-    if message.status == "sent":
+    time.sleep(10)
+    if message.status != "failed" and message.status != "canceled" and message.status != "undelivered":
         confimation_message = client.messages.create(
             body=f"Message sent to SC: {message.body}\n Date: {message.date_sent}",
             from_=MY_TWILIO_NUMBER,

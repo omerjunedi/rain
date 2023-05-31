@@ -3,3 +3,6 @@ bin/
 lib/
 __pycache__/
 secret.py
+nicknames.txt
+quotes.txt
+test.py
