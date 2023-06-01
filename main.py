@@ -8,7 +8,7 @@ BASE_URL: str = "https://api.openweathermap.org/data/2.5/weather?id="
 
 
 
-def select_quote_and_name() -> tuple(str):
+def select_quote_and_name() -> tuple[str]:
     with open("quotes.txt", 'r') as file:
         quote = file.readlines()
 
@@ -27,12 +27,13 @@ def api_call():
     complete_url = BASE_URL + CITY_ID + "&appid=" + API_KEY + "&units=metric"
     data = requests.get(complete_url).json()
     weather = data["weather"]
-    
+    forecast = weather[0]["main"]
+    is_rainy = False
     # id's under 600 correspond to sometype of rain in OpenWeatherAPI
     if weather[0]["id"] < 600:
-        forecast = weather[0]["main"]
-        send_message(forecast)
         is_rainy = True
+
+    send_message(forecast, is_rainy)
     
 
 def send_message(forecast: str, is_rainy: bool):
