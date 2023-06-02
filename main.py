@@ -1,9 +1,12 @@
 # set up credentials and api call
 import requests
 import random
-from secret import API_KEY, CITY_ID, CITY_NAME, ACCOUNT_SID, AUTH_TOKEN, SHAWTY_BAES_NUMBER, MY_TWILIO_NUMBER, CONFIRMATION_NUMBER, LATITUDE, LONGITUDE
+from secret import API_KEY, CITY_ID, CITY_NAME, ACCOUNT_SID, AUTH_TOKEN, \
+    SHAWTY_BAES_NUMBER, MY_TWILIO_NUMBER, CONFIRMATION_NUMBER, LATITUDE, LONGITUDE
 from twilio.rest import Client
 from time import strftime, localtime, sleep
+from datetime import datetime
+from pytz import timezone
 
 
 
@@ -42,14 +45,20 @@ def check_rain_next_12_hours():
     url: str = f"https://api.openweathermap.org/data/2.5/forecast?lat={LATITUDE}&lon={LONGITUDE}&appid={API_KEY}"
     data = requests.get(url).json()
 
+
+    forecast = "no rain"
     is_rainy = False
+    time = datetime.now(timezone('EST')).time()
     for i in range(5):
         if data['list'][i]['weather'][0]['id'] < 600:
             is_rainy = True
             forecast = data['list'][i]['weather'][0]['main']
             time = strftime('%Y-%m-%d %H:%M:%S', localtime(data['list'][i]['dt']))
+            print(forecast, time, is_rainy)
+            break
+            
         
-        send_message(forecast, is_rainy, time)
+    send_message(forecast, is_rainy, time)
 
 
 
