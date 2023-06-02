@@ -36,12 +36,15 @@ def check_weather():
     if weather[0]["id"] < 600:
         is_rainy = True
 
-    send_message(forecast, is_rainy)
+    return forecast, is_rainy
     
-# Old approach was to run the script at 8:00 AM and send message based on that, only problem is that it checks the current weather only. So if it rains later in the day,
-# it won't send anything which sort of defeats the purpose of this. The new approach is to check the next 12 hours at intervals of 3-hours and send a message if it is forcasted
-# to rain at any of those times. The text message also includes at which time it is forecasted to rain. 
-def check_rain_next_12_hours():
+# Old approach was to run the script at 8:00 AM and send message based on that, 
+# only problem is that it checks the current weather only. So if it rains later in the day,
+# it won't send anything which sort of defeats the purpose of this. The new approach is to 
+# check the next 12 hours at intervals of 3-hours and send a message if it is forcasted
+# to rain at any of those times. The text message also includes at which time it is 
+# forecasted to rain. 
+def check_rain_next_12_hours() -> tuple[str]:
     url: str = f"https://api.openweathermap.org/data/2.5/forecast?lat={LATITUDE}&lon={LONGITUDE}&appid={API_KEY}"
     data = requests.get(url).json()
 
@@ -56,9 +59,10 @@ def check_rain_next_12_hours():
             time = strftime('%Y-%m-%d %H:%M:%S', localtime(data['list'][i]['dt']))
             print(forecast, time, is_rainy)
             break
-            
-        
-    send_message(forecast, is_rainy, time)
+
+
+
+    return forecast, is_rainy, time
 
 
 
@@ -90,7 +94,8 @@ def send_message(forecast: str, is_rainy: bool, time: str = "Right Now!"):
         )
 
 def main():
-    check_rain_next_12_hours()
+    curr_forecast, rain, time = check_rain_next_12_hours()
+    send_message(forecast=curr_forecast, is_rainy=rain, time=time)
 
 if __name__ == "__main__":
     main()
